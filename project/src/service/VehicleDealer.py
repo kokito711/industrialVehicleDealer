@@ -150,7 +150,7 @@ class VehicleDealer:
         else:
             for index, user in enumerate(cls.user_list):
                 _print_user_info(user)
-                if index % 2 == 0:
+                if index % 2 != 0:
                     _print_end_line_and_wait_for_enter()
                     _clear()
                 else:
@@ -182,7 +182,7 @@ class VehicleDealer:
         else:
             for index, sale in enumerate(cls.sales_list):
                 _print_common_sale_info(sale)
-                if index % 2 == 0:
+                if index % 2 != 0:
                     _print_end_line_and_wait_for_enter()
                     _clear()
                 else:
@@ -214,26 +214,26 @@ class VehicleDealer:
     def get_sale_vehicle(cls, license_plate):
         for sale in cls.sales_list:
             if sale.vehicle.license_plate == license_plate:
-                return sale
+                return sale.vehicle
         logging.error('Sale not found for plate license %s', license_plate)
 
     @classmethod
     def add_proprietary(cls, proprietary: Proprietary, license_plate):
         for vehicle in cls.vehicle_list:
-            if vehicle.license_plate() == license_plate:
+            if vehicle.license_plate == license_plate:
                 vehicle.proprietary = proprietary
 
     @classmethod
-    def exist_vehicle(cls, vehicle: Vehicle):
+    def exist_vehicle(cls, license_plate):
         for elem in cls.vehicle_list:
-            if elem == vehicle:
+            if elem.license_plate == license_plate:
                 return True
         return False
 
     @classmethod
-    def exist_user(cls, user: User):
+    def exist_user(cls, user_id):
         for elem in cls.user_list:
-            if elem == user:
+            if elem.get_user_code() == user_id:
                 return True
         return False
 
