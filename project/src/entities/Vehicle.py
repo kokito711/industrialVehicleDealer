@@ -10,7 +10,7 @@ class Vehicle:
     a parte de estos atributos contiene otros de tipos “comunes”.
     """
 
-    def __init__(self, license_plate, brand, model, color, build_date: datetime, kilometers, observations=None):
+    def __init__(self, license_plate, brand, model, color, build_date: datetime.date, kilometers, observations=None):
         date = datetime.now()
 
         if observations is None:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from project.src.entities import Vehicle
+from project.src.entities.Vehicle import Vehicle
 
 
 class Van(Vehicle):
@@ -9,7 +9,7 @@ class Van(Vehicle):
     """
 
     def __init__(self, load_volume, load_longitude, license_plate, brand, model,
-                 color, build_date: datetime, kilometers, observations=None):
+                 color, build_date: datetime.date, kilometers, observations=None):
         super(Van, self).__init__(license_plate, brand, model, color, build_date, kilometers, observations)
         self.load_volume = load_volume
         self.load_longitude = load_longitude

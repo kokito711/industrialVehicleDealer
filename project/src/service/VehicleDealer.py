@@ -86,22 +86,26 @@ class VehicleDealer:
     Estas listas almacenarán todos los datos del concesionario.
     """
 
-    def __init__(self):
-        self.user_list = list()
-        self.sales_list = list()
-        self.vehicle_list = list()
+    @classmethod
+    def __init__(cls):
+        cls.user_list = list()
+        cls.sales_list = list()
+        cls.vehicle_list = list()
 
-    def add_vehicle(self, vehicle: Vehicle):
-        self.vehicle_list.append(vehicle)
+    @classmethod
+    def add_vehicle(cls, vehicle: Vehicle):
+        cls.vehicle_list.append(vehicle)
 
-    def remove_vehicle(self, register_number):
-        for index, vehicle in enumerate(self.vehicle_list):
+    @classmethod
+    def remove_vehicle(cls, register_number):
+        for index, vehicle in enumerate(cls.vehicle_list):
             if vehicle.get_register_number() == register_number:
-                self.vehicle_list.remove(index)
+                cls.vehicle_list.remove(index)
         logging.error('Vehicle with ID %s not found', register_number)
 
-    def show_showroom_vehicle_info(self, register_number):
-        vehicle = self.get_showroom_vehicle(register_number)
+    @classmethod
+    def show_showroom_vehicle_info(cls, register_number):
+        vehicle = cls.get_showroom_vehicle(register_number)
         if vehicle is not None:
             _print_common_vehicle_info(vehicle)
             _print_truck_info_if_is_truck(vehicle)
@@ -109,37 +113,42 @@ class VehicleDealer:
             _print_van_info_if_is_van(vehicle)
             _print_end_line_and_wait_for_enter()
 
-    def get_vehicle_list(self):
-        if len(self.vehicle_list) == 0:
+    @classmethod
+    def get_vehicle_list(cls):
+        if len(cls.vehicle_list) == 0:
             print('No vehicles in showroom')
             input('Press <Enter> to continue')
         else:
-            for vehicle in self.vehicle_list:
+            for vehicle in cls.vehicle_list:
                 _print_common_vehicle_info(vehicle)
                 _print_end_line_and_wait_for_enter()
                 _clear()
 
-    def get_showroom_vehicle(self, register_number):
-        for vehicle in self.vehicle_list:
+    @classmethod
+    def get_showroom_vehicle(cls, register_number):
+        for vehicle in cls.vehicle_list:
             if vehicle.get_register_number() == register_number:
                 return vehicle
         logging.error('Vehicle with ID %s not found', register_number)
 
-    def add_user(self, user: User):
-        self.user_list.append(user)
+    @classmethod
+    def add_user(cls, user: User):
+        cls.user_list.append(user)
 
-    def delete_user(self, user_id):
-        for index, user in enumerate(self.user_list):
+    @classmethod
+    def delete_user(cls, user_id):
+        for index, user in enumerate(cls.user_list):
             if user.get_user_code() == user_id:
-                self.user_list.remove(index)
+                cls.user_list.remove(index)
         logging.error('User with ID %s not found', user_id)
 
-    def get_users_list(self):
-        if len(self.user_list) == 0:
+    @classmethod
+    def get_users_list(cls):
+        if len(cls.user_list) == 0:
             print('No users')
             input('Press <Enter> to continue')
         else:
-            for index, user in enumerate(self.user_list):
+            for index, user in enumerate(cls.user_list):
                 _print_user_info(user)
                 if index % 2 == 0:
                     _print_end_line_and_wait_for_enter()
@@ -147,27 +156,31 @@ class VehicleDealer:
                 else:
                     print('=============================================')
 
-    def get_user_info(self, user_id):
-        for user in self.user_list:
+    @classmethod
+    def get_user_info(cls, user_id):
+        for user in cls.user_list:
             if user.get_user_code() == user_id:
                 _print_user_info(user)
                 _print_end_line_and_wait_for_enter()
 
-    def get_user(self, user_id):
-        for user in self.user_list:
+    @classmethod
+    def get_user(cls, user_id):
+        for user in cls.user_list:
             if user.get_user_code() == user_id:
                 return user
         logging.error('User with ID %s not found', user_id)
 
-    def sell_vehicle(self, sale: Sale):
-        self.sales_list.append(sale)
+    @classmethod
+    def sell_vehicle(cls, sale: Sale):
+        cls.sales_list.append(sale)
 
-    def show_sale_list(self):
-        if len(self.sales_list) == 0:
+    @classmethod
+    def show_sale_list(cls):
+        if len(cls.sales_list) == 0:
             print('No sales')
             input('Press <Enter> to continue')
         else:
-            for index, sale in enumerate(self.sales_list):
+            for index, sale in enumerate(cls.sales_list):
                 _print_common_sale_info(sale)
                 if index % 2 == 0:
                     _print_end_line_and_wait_for_enter()
@@ -175,12 +188,13 @@ class VehicleDealer:
                 else:
                     print('=============================================')
 
-    def show_sale_info(self, license_plate):
-        if len(self.sales_list) == 0:
+    @classmethod
+    def show_sale_info(cls, license_plate):
+        if len(cls.sales_list) == 0:
             print('No sales')
             input('Press <Enter> to continue')
         else:
-            for sale in self.sales_list:
+            for sale in cls.sales_list:
                 if sale.vehicle.license_plate == license_plate:
                     _print_common_sale_info(sale)
                     _print_truck_info_if_is_truck(sale.vehicle)
@@ -196,31 +210,36 @@ class VehicleDealer:
                         print('Business name: ' + sale.vehicle.proprietary.business_name)
                     _print_end_line_and_wait_for_enter()
 
-    def get_sale_vehicle(self, license_plate):
-        for sale in self.sales_list:
+    @classmethod
+    def get_sale_vehicle(cls, license_plate):
+        for sale in cls.sales_list:
             if sale.vehicle.license_plate == license_plate:
                 return sale
         logging.error('Sale not found for plate license %s', license_plate)
 
-    def add_proprietary(self, proprietary: Proprietary, license_plate):
-        for vehicle in self.vehicle_list:
+    @classmethod
+    def add_proprietary(cls, proprietary: Proprietary, license_plate):
+        for vehicle in cls.vehicle_list:
             if vehicle.license_plate() == license_plate:
                 vehicle.proprietary = proprietary
 
-    def exist_vehicle(self, vehicle: Vehicle):
-        for elem in self.vehicle_list:
+    @classmethod
+    def exist_vehicle(cls, vehicle: Vehicle):
+        for elem in cls.vehicle_list:
             if elem == vehicle:
                 return True
         return False
 
-    def exist_user(self, user: User):
-        for elem in self.user_list:
+    @classmethod
+    def exist_user(cls, user: User):
+        for elem in cls.user_list:
             if elem == user:
                 return True
         return False
 
-    def exist_sale(self, license_plate):
-        for sale in self.sales_list:
+    @classmethod
+    def exist_sale(cls, license_plate):
+        for sale in cls.sales_list:
             if sale.vehicle.license_plate == license_plate:
                 return True
         return False

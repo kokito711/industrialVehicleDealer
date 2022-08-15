@@ -54,7 +54,7 @@ class TestUser(TestCase):
         user = create_user()
         user.set_surnames(SURNAME_1 + "1", "")
 
-        self.assertEqual(user.surnames(), SURNAME_1 + "1")
+        self.assertEqual(user.get_surnames(), SURNAME_1 + "1")
 
     def test_set_pwd(self):
         new_pwd = "NewPwd"
