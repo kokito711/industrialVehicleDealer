@@ -13,6 +13,9 @@ class Vehicle:
     def __init__(self, license_plate, brand, model, color, build_date: datetime, kilometers, observations=None):
         date = datetime.now()
 
+        if observations is None:
+            observations = list()
+
         self.__register_number = date.strftime('ddMMyyyyHHmmss')
         self.license_plate = license_plate
         self.brand = brand
@@ -30,6 +33,9 @@ class Vehicle:
 
     def get_buy_date(self):
         return self.buy_date.strftime('dd/MM/yyyy')
+
+    def get_build_date(self):
+        return self.build_date.strftime('dd/MM/yyyy')
 
     def add_maintenance(self, maintenance: Maintenance):
         self.maintenance.append(maintenance)
