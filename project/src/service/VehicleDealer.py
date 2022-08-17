@@ -231,6 +231,13 @@ class VehicleDealer:
         return False
 
     @classmethod
+    def exist_vehicle_by_register_number(cls, register_number):
+        for elem in cls.vehicle_list:
+            if elem.get_register_number() == register_number:
+                return True
+        return False
+
+    @classmethod
     def exist_user(cls, user_id):
         for elem in cls.user_list:
             if elem.get_user_code() == user_id:

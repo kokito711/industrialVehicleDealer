@@ -1,7 +1,12 @@
+import datetime
 import random
 
+from project.src.entities.Bus import Bus
 from project.src.entities.Maintenance import Maintenance
+from project.src.entities.Truck import Truck
 from project.src.entities.User import User
+from project.src.entities.Van import Van
+from project.src.entities.Video import Video
 from project.src.service.VehicleDealer import VehicleDealer
 
 
@@ -20,13 +25,44 @@ def initialize_vehicle_dealer():
             submenu_option = None
             while submenu_option is None or submenu_option != 'S':
                 submenu_option = _get_menu_showroom()
-                # TODO
+                if submenu_option == 'A':
+                    _clear()
+                    vehicle_type = _select_vehicle_type()
+                    _insert_vehicle_values(vehicle_dealer, vehicle_type)
+                    _press_enter('Vehicle successfully added')
+                elif submenu_option == 'B':
+                    _clear()
+                    _remove_vehicle(vehicle_dealer)
+                elif submenu_option == 'M':
+                    _clear()
+                    # TODO
+                elif submenu_option == 'L':
+                    _clear()
+                    vehicle_dealer.get_vehicle_list()
+                elif submenu_option == 'V':
+                    _clear()
+                    _show_vehicle_info(vehicle_dealer)
+                else:
+                    pass
         elif chosen_option == 'V':
             submenu_option = None
             while submenu_option is None or submenu_option != 'S':
                 submenu_option = _get_menu_sales()
-                # TODO
-                pass
+                if submenu_option == 'V':
+                    _clear()
+                    # TODO
+                elif submenu_option == 'L':
+                    _clear()
+                    vehicle_dealer.show_sale_list()
+                elif submenu_option == 'M':
+                    _clear()
+                    license_plate = input('Please, introduce the vehicle\'s license plate')
+                    if _is_valid_license_plate(license_plate) and vehicle_dealer.exist_sale(license_plate):
+                        vehicle_dealer.show_sale_info(license_plate)
+                    else:
+                        _press_enter('Sale does not exist')
+                else:
+                    pass
         elif chosen_option == 'M':
             _manage_maintenance(vehicle_dealer)
         elif chosen_option == 'U':
@@ -39,6 +75,230 @@ def initialize_vehicle_dealer():
     print('Number of Users: ' + str(len(vehicle_dealer.user_list)))
 
     print('Application will be closed...\nSee you soon!')
+
+
+def _show_vehicle_info(vehicle_dealer):
+    register_number = _read_value_from_prompt('vehicle\'s register number')
+    if register_number is None or len(register_number) == 0:
+        _press_enter('Register number not valid')
+    elif vehicle_dealer.exist_vehicle_by_register_number(register_number):
+        vehicle_dealer.show_showroom_vehicle_info(register_number)
+    else:
+        _press_enter('Vehicle does not exist')
+
+
+def _remove_vehicle(vehicle_dealer):
+    register_number = _read_value_from_prompt('vehicle\'s register number')
+    if register_number is None or len(register_number) == 0:
+        _press_enter('Register number not valid')
+    elif vehicle_dealer.exist_vehicle_by_register_number(register_number):
+        vehicle_dealer.remove_vehicle(register_number)
+        _press_enter('Vehicle successfully removed')
+    else:
+        _press_enter('Vehicle does not exist')
+
+
+def _insert_vehicle_values(vehicle_dealer, vehicle_type):
+    if vehicle_type == 1:
+        _set_truck_values_and_save(vehicle_dealer)
+    elif vehicle_type == 2:
+        _set_bus_values_and_save(vehicle_dealer)
+    else:
+        _set_van_values_and_save(vehicle_dealer)
+
+
+def _set_van_values_and_save(vehicle_dealer):
+    brand = _insert_vehicle_brand()
+    model = _insert_vehicle_model()
+    color = _insert_vehicle_color()
+    build_date = _insert_vehicle_build_date()
+    passengers = _insert_passengers_number()
+    max_volume_load = _insert_max_volume_load()
+    max_load_length = _insert_max_load_length()
+    kilometers = _insert_vehicle_kilometers()
+    observations = _insert_observations()
+    vehicle_dealer.add_vehicle(
+        Van(brand, model, color, build_date, passengers, max_volume_load, max_load_length,
+            kilometers, observations))
+
+
+def _set_bus_values_and_save(vehicle_dealer):
+    brand = _insert_vehicle_brand()
+    model = _insert_vehicle_model()
+    color = _insert_vehicle_color()
+    build_date = _insert_vehicle_build_date()
+    passengers = _insert_passengers_number()
+    video = _insert_video()
+    wheel_number = _insert_wheel_number()
+    kilometers = _insert_vehicle_kilometers()
+    observations = _insert_observations()
+    vehicle_dealer.add_vehicle(
+        Bus(brand, model, color, build_date, passengers, video, wheel_number, kilometers,
+            observations))
+
+
+def _set_truck_values_and_save(vehicle_dealer):
+    brand = _insert_vehicle_brand()
+    model = _insert_vehicle_model()
+    color = _insert_vehicle_color()
+    build_date = _insert_vehicle_build_date()
+    tara = _insert_tara()
+    max_auth_load = _insert_max_auth_load()
+    wheel_number = _insert_wheel_number()
+    kilometers = _insert_vehicle_kilometers()
+    observations = _insert_observations()
+    vehicle_dealer.add_vehicle(
+        Truck(brand, model, color, build_date, tara, max_auth_load, wheel_number, kilometers,
+              observations))
+
+
+def _insert_vehicle_brand(brand=None):
+    while brand is None:
+        input_value = _read_value_from_prompt('vehicle\'s brand')
+        if input_value is not None and len(input_value) > 0:
+            brand = input_value
+        else:
+            print("Brand cannot be empty")
+    return brand
+
+
+def _insert_vehicle_model(model=None):
+    while model is None:
+        input_value = _read_value_from_prompt('vehicle\'s model')
+        if input_value is not None and len(input_value) > 0:
+            model = input_value
+        else:
+            print("Model cannot be empty")
+    return model
+
+
+def _insert_vehicle_color(color=None):
+    while color is None:
+        input_value = _read_value_from_prompt('vehicle\'s color')
+        if input_value is not None and len(input_value) > 0:
+            color = input_value
+        else:
+            print("Color cannot be empty")
+    return color
+
+
+def _insert_vehicle_build_date(build_date=None):
+    while build_date is None:
+        input_value = _read_value_from_prompt('vehicle\'s build date (dd/MM/yyyy')
+        try:
+            datetime.datetime.strptime(input_value, '%02d/-%02d/%04d')
+            build_date = input_value
+        except (TypeError, ValueError):
+            print("Build date cannot be empty or format is not valid")
+    return build_date
+
+
+def _insert_tara(tara=None):
+    while tara is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s TARA'))
+        if input_value is not None and input_value > 0:
+            tara = input_value
+        else:
+            print("TARA cannot be empty")
+    return tara
+
+
+def _insert_max_auth_load(max_auth_load=None):
+    while max_auth_load is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s maximum authorized load'))
+        if input_value is not None and input_value > 0:
+            max_auth_load = input_value
+        else:
+            print("Maximum authorized load cannot be empty")
+    return max_auth_load
+
+
+def _insert_wheel_number(wheel_number=None):
+    while wheel_number is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s number of wheels'))
+        if input_value is not None and input_value > 0:
+            wheel_number = input_value
+        else:
+            print("Number of wheels cannot be empty")
+    return wheel_number
+
+
+def _insert_passengers_number(passengers_number=None):
+    while passengers_number is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s number of passengers'))
+        if input_value is not None and input_value > 0:
+            passengers_number = input_value
+        else:
+            print("Number of passengers cannot be empty")
+    return passengers_number
+
+
+def _insert_max_load_length(max_load_length=None):
+    while max_load_length is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s maximum load length'))
+        if input_value is not None and input_value > 0:
+            max_load_length = input_value
+        else:
+            print("Maximum load length cannot be empty")
+    return max_load_length
+
+
+def _insert_max_volume_load(max_volume_load=None):
+    while max_volume_load is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s maximum load volume'))
+        if input_value is not None and input_value > 0:
+            max_volume_load = input_value
+        else:
+            print("Maximum load volume cannot be empty")
+    return max_volume_load
+
+
+def _insert_video(video=None):
+    while video is None:
+        input_value = _read_value_from_prompt('vehicle\'s contains video (YES/NO)')
+        if input_value is not None:
+            if input_value == 'YES':
+                video = Video.YES
+            elif input_value == 'NO':
+                video = Video.NO
+            else:
+                print("Vehicle's video not valid")
+        else:
+            print("Vehicle's video cannot be empty")
+    return video
+
+
+def _insert_vehicle_kilometers(vehicle_kilometers=None):
+    while vehicle_kilometers is None:
+        input_value = int(_read_value_from_prompt('vehicle\'s kilometers'))
+        if input_value is not None and input_value > 0:
+            vehicle_kilometers = input_value
+        else:
+            print("Kilometers cannot be empty")
+    return vehicle_kilometers
+
+
+def _insert_observations():
+    has_observations = input("Would you like to include any additional info? (s/n)")
+    input_value = None
+    if len(has_observations) == 1 and str(has_observations).upper() == 's':
+        input_value = _read_value_from_prompt('additional information')
+    if input_value is not None and len(input_value) > 0:
+        return input_value
+    else:
+        print("No additional info added")
+        return None
+
+
+def _select_vehicle_type(vehicle_type=None):
+    while vehicle_type is None:
+        print('1 Truck')
+        print('2 Bus')
+        print('3 Van')
+        input_val = input('Please select one type: ')
+        if input_val is not None and input_val in [1, 2, 3]:
+            vehicle_type = input_val
+    return vehicle_type
 
 
 def _manage_maintenance(vehicle_dealer):
@@ -65,8 +325,7 @@ def _show_maintenances(vehicle_dealer):
         print('========================================')
         vehicle_dealer.get_sale_vehicle(license_plate).print_maintenance_list()
     else:
-        print('Vehicle with the given license plate does not exist or license plate not correct')
-        _press_enter()
+        _press_enter('Vehicle with the given license plate does not exist or license plate not correct')
 
 
 def _add_maintenance(vehicle_dealer):
@@ -95,11 +354,9 @@ def _add_maintenance(vehicle_dealer):
                 print('Price cannot be empty or is a valid value')
         vehicle_dealer.get_sale_vehicle(license_plate) \
             .add_maintenance(Maintenance(kilometers, operations, price))
-        print('Maintenance successfully added.')
-        _press_enter()
+        _press_enter('Maintenance successfully added.')
     else:
-        print('Vehicle with the given license plate does not exist or license plate not correct')
-        _press_enter()
+        _press_enter('Vehicle with the given license plate does not exist or license plate not correct')
 
 
 def _is_valid_license_plate(license_plate):
@@ -150,8 +407,7 @@ def _delete_user(vehicle_dealer):
                 print('User won\'t be removed')
         _press_enter()
     else:
-        print('User Id does not exist.')
-        _press_enter()
+        _press_enter('User Id does not exist.')
 
 
 def _add_new_user(vehicle_dealer):
@@ -172,8 +428,7 @@ def _add_new_user(vehicle_dealer):
     username = input('Please enter a name: ')
     surnames = input('Please enter surnames: ')
     vehicle_dealer.add_user(User(user, username, surnames, pwd))
-    print('User successfully added.')
-    _press_enter()
+    _press_enter('User successfully added.')
 
 
 def _show_user_info(vehicle_dealer):
@@ -181,8 +436,7 @@ def _show_user_info(vehicle_dealer):
     if vehicle_dealer.exist_user(user_id):
         vehicle_dealer.get_user_info(user_id)
     else:
-        print('User with ID ' + user_id + ' not found')
-        _press_enter()
+        _press_enter('User with ID ' + user_id + ' not found')
 
 
 def _login_user(vehicle_dealer):
@@ -194,8 +448,7 @@ def _login_user(vehicle_dealer):
         user = vehicle_dealer.get_user(user_id)
         if user is not None and user.get_pwd() == pwd:
             logged = True
-            print('Welcome to Vehicle dealer application ' + user.get_name() + ' ' + user.get_surnames() + '!')
-            _press_enter()
+            _press_enter('Welcome to Vehicle dealer application ' + user.get_name() + ' ' + user.get_surnames() + '!')
         else:
             print('User or password not valid, please try it again')
 
@@ -207,7 +460,7 @@ def _create_user_first_time_user(vehicle_dealer):
     surnames = _read_value_from_prompt('surnames')
     password = _read_value_from_prompt('password')
     vehicle_dealer.add_user(User(user_id, username, surnames, password))
-    print('Your user id is:' + user_id)
+    print('Your user id is:' + str(user_id))
 
 
 def _read_value_from_prompt(required_value):
@@ -310,7 +563,9 @@ def _clear():
     print('\n' * 100)
 
 
-def _press_enter():
+def _press_enter(previous_msg=None):
+    if previous_msg is not None:
+        print(previous_msg)
     input('Press <Enter> to continue')
 
 
