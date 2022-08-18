@@ -21,7 +21,7 @@ class Vehicle:
         self.brand = brand
         self.model = model
         self.color = color
-        self.buy_date = date
+        self.buy_date = None
         self.build_date = build_date
         self.kilometers = kilometers
         self.observations = observations
