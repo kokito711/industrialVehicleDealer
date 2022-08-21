@@ -12,8 +12,8 @@ from project.src.service.VehicleDealer import VehicleDealer
 
 def initialize_vehicle_dealer():
     vehicle_dealer: VehicleDealer = VehicleDealer()
-    vehicle_dealer.add_user(User('1234', 'Sergio', 'Lopez Jimenez', '1234'))
-    if len(vehicle_dealer.user_list) == 0:
+    # vehicle_dealer.add_user(User('1234', 'Sergio', 'Lopez Jimenez', '1234'))
+    if not vehicle_dealer.exist_any_user():
         _create_user_first_time_user(vehicle_dealer)
     else:
         _login_user(vehicle_dealer)
@@ -445,8 +445,8 @@ def _login_user(vehicle_dealer):
         user_id = _read_value_from_prompt('user ID')
         pwd = _read_value_from_prompt('password')
         _clear()
-        user = vehicle_dealer.get_user(user_id)
-        if user is not None and user.get_pwd() == pwd:
+        user = vehicle_dealer.auth_user(user_id, pwd)
+        if user is not None:
             logged = True
             _press_enter('Welcome to Vehicle dealer application ' + user.get_name() + ' ' + user.get_surnames() + '!')
         else:
@@ -454,13 +454,18 @@ def _login_user(vehicle_dealer):
 
 
 def _create_user_first_time_user(vehicle_dealer):
-    print('No users right now. Proceeding to create a new one...')
-    user_id = random.Random
-    username = _read_value_from_prompt('name')
-    surnames = _read_value_from_prompt('surnames')
-    password = _read_value_from_prompt('password')
-    vehicle_dealer.add_user(User(user_id, username, surnames, password))
-    print('Your user id is:' + str(user_id))
+    user = None
+    while user is None:
+        print('No users right now. Proceeding to create a new one...')
+        user_id = str(random.randrange(1000, 9999))
+        username = _read_value_from_prompt('name')
+        surnames = _read_value_from_prompt('surnames')
+        password = _read_value_from_prompt('password')
+        user = vehicle_dealer.add_user(User(user_id, username, surnames, password))
+        if user is None:
+            _press_enter('User already exist, please try again')
+        else:
+            _press_enter('Your user id is:' + str(user.get_user_code()))
 
 
 def _read_value_from_prompt(required_value):

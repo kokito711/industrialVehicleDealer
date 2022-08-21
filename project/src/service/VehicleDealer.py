@@ -1,6 +1,9 @@
+import json
 import logging
+import random
 from os import system, name
 
+import requests
 from singleton_decorator import singleton
 
 from project.src.entities.Bus import Bus
@@ -10,6 +13,8 @@ from project.src.entities.Truck import Truck
 from project.src.entities.User import User
 from project.src.entities.Van import Van
 from project.src.entities.Vehicle import Vehicle
+
+URL = "http://127.0.0.1:8000/users"
 
 
 def _print_truck_info_if_is_truck(vehicle):
@@ -78,6 +83,10 @@ def _print_end_line_and_wait_for_enter():
     input('Press <Enter> to continue')
 
 
+class BackEndException(Exception):
+    pass
+
+
 @singleton
 class VehicleDealer:
     """
@@ -133,7 +142,19 @@ class VehicleDealer:
 
     @classmethod
     def add_user(cls, user: User):
-        cls.user_list.append(user)
+        user_id = user.get_user_code()
+        while requests.get(URL + "/" + user_id).status_code == 200:
+            user_id = str(random.randrange(1000, 9999))
+        user.set_user_code(user_id)
+        create_user_req = requests.post(URL, json=json.dumps(user))
+        if create_user_req.status_code == 201:
+            create_user_req = create_user_req.json()
+            user = User(create_user_req.user_code, create_user_req.name, create_user_req.surnames)
+            return user
+        elif create_user_req.status_code == 200:
+            return None
+        else:
+            raise BackEndException("Cannot connect with backend")
 
     @classmethod
     def delete_user(cls, user_id):
@@ -164,11 +185,15 @@ class VehicleDealer:
                 _print_end_line_and_wait_for_enter()
 
     @classmethod
-    def get_user(cls, user_id):
-        for user in cls.user_list:
-            if user.get_user_code() == user_id:
-                return user
-        logging.error('User with ID %s not found', user_id)
+    def auth_user(cls, user_id, pwd):
+        body = {"client_id": user_id, "client_secret": pwd}
+        auth_request = requests.post("%s/auth" % URL, json=json.dumps(body))
+        if auth_request.status_code == 200:
+            auth_request = auth_request.json()
+            user = User(auth_request.user_code, auth_request.name, auth_request.surnames)
+            return user
+        logging.error('User with ID %s not authorized', user_id)
+        return None
 
     @classmethod
     def sell_vehicle(cls, sale: Sale):
@@ -250,3 +275,15 @@ class VehicleDealer:
             if sale.vehicle.license_plate == license_plate:
                 return True
         return False
+
+    @classmethod
+    def exist_any_user(cls):
+        user_request = requests.get("%s/users" % URL)
+        if user_request.status_code == 200:
+            user_request = user_request.json()
+            if len(user_request) > 0:
+                return True
+            else:
+                return False
+        else:
+            raise BackEndException("Cannot connect with backend")

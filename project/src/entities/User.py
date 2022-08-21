@@ -6,7 +6,7 @@ class User:
 
     """Builder"""
 
-    def __init__(self, user_code, name, surnames, pwd):
+    def __init__(self, user_code, name, surnames, pwd=None):
         self.__user_code = user_code
         self.__name = name
         self.__surnames = surnames
